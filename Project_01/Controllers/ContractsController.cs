@@ -2,6 +2,7 @@
 using Project_01.Domain.Contracts;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
+using Project_01.RequestModels.Contracts;
 
 namespace Project_01.Controllers;
 
@@ -10,14 +11,25 @@ namespace Project_01.Controllers;
 public class ContractsController(IContractService contractService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateContract([FromBody] Contract contract)
+    public async Task<IActionResult> CreateContract([FromBody] CreateContractRequest createContractRequest)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        var contract = new Contract
+        {
+            ClientId = createContractRequest.ClientId,
+            ProductId = createContractRequest.ProductId,
+            StartDate = createContractRequest.StartDate,
+            EndDate = createContractRequest.EndDate,
+            IsSigned = createContractRequest.IsSigned,
+            SupportYears = createContractRequest.SupportYears
+        };
+
         var createdContract = await contractService.CreateContractAsync(contract);
+
         return CreatedAtAction(nameof(GetContractById), new { id = createdContract.Id }, createdContract);
     }
 
@@ -41,22 +53,30 @@ public class ContractsController(IContractService contractService) : ControllerB
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateContract(int id, [FromBody] Contract contract)
+    public async Task<IActionResult> UpdateContract(int id, [FromBody] UpdateContractRequest updateContractRequest)
     {
-        if (id != contract.Id)
-        {
-            return BadRequest("Id in body and id in route should be the same");
-        }
 
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        var contract = new Contract
+        {
+            Id = id,
+            ClientId = updateContractRequest.ClientId,
+            ProductId = updateContractRequest.ProductId,
+            StartDate = updateContractRequest.StartDate,
+            EndDate = updateContractRequest.EndDate,
+            TotalPrice = updateContractRequest.TotalPrice,
+            IsSigned = updateContractRequest.IsSigned,
+            SupportYears = updateContractRequest.SupportYears
+        };
+
         try
         {
-            var updatedContract = await contractService.UpdateContractAsync(contract);
-            return Ok(updatedContract);
+            await contractService.UpdateContractAsync(contract);
+            return NoContent();
         }
         catch (NotFoundException)
         {

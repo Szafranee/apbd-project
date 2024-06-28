@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project_01.Domain.Clients;
-using Project_01.DTOs;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
+using Project_01.RequestModels.Clients;
 
 namespace Project_01.Controllers;
 
@@ -11,7 +11,7 @@ namespace Project_01.Controllers;
 public class ClientsController(IClientService clientService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> AddClient([FromBody] ClientDto clientDto)
+    public async Task<IActionResult> AddClient([FromBody] CreateClientRequest createClientRequest)
     {
         if (!ModelState.IsValid)
         {
@@ -21,36 +21,36 @@ public class ClientsController(IClientService clientService) : ControllerBase
         try
         {
             Client client;
-            if (clientDto.ClientType == "Individual")
+            if (createClientRequest.ClientType == "Individual")
             {
-                if (string.IsNullOrEmpty(clientDto.LastName) || string.IsNullOrEmpty(clientDto.PESEL))
+                if (string.IsNullOrEmpty(createClientRequest.LastName) || string.IsNullOrEmpty(createClientRequest.PESEL))
                 {
                     return BadRequest("LastName and PESEL are required for Individual clients.");
                 }
                 client = new IndividualClient
                 {
-                    Name = clientDto.Name,
-                    LastName = clientDto.LastName,
-                    PESEL = clientDto.PESEL,
-                    Address = clientDto.Address,
-                    Email = clientDto.Email,
-                    PhoneNumber = clientDto.PhoneNumber,
+                    Name = createClientRequest.Name,
+                    LastName = createClientRequest.LastName,
+                    PESEL = createClientRequest.PESEL,
+                    Address = createClientRequest.Address,
+                    Email = createClientRequest.Email,
+                    PhoneNumber = createClientRequest.PhoneNumber,
                     ClientType = ClientType.Individual
                 };
             }
-            else if (clientDto.ClientType == "Corporate")
+            else if (createClientRequest.ClientType == "Corporate")
             {
-                if (string.IsNullOrEmpty(clientDto.KRS))
+                if (string.IsNullOrEmpty(createClientRequest.KRS))
                 {
                     return BadRequest("KRS is required for Corporate clients.");
                 }
                 client = new CorporateClient
                 {
-                    Name = clientDto.Name,
-                    KRS = clientDto.KRS,
-                    Address = clientDto.Address,
-                    Email = clientDto.Email,
-                    PhoneNumber = clientDto.PhoneNumber,
+                    Name = createClientRequest.Name,
+                    KRS = createClientRequest.KRS,
+                    Address = createClientRequest.Address,
+                    Email = createClientRequest.Email,
+                    PhoneNumber = createClientRequest.PhoneNumber,
                     ClientType = ClientType.Corporate
                 };
             }
@@ -69,7 +69,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientDto clientDto)
+    public async Task<IActionResult> UpdateClient(int id, [FromBody] UpdateClientRequest updateClientRequest)
     {
         var existingClient = await clientService.GetClientByIdAsync(id);
         if (existingClient == null)
@@ -77,25 +77,25 @@ public class ClientsController(IClientService clientService) : ControllerBase
             return NotFound();
         }
 
-        existingClient.Name = clientDto.Name;
-        existingClient.Address = clientDto.Address;
-        existingClient.Email = clientDto.Email;
-        existingClient.PhoneNumber = clientDto.PhoneNumber;
+        existingClient.Name = updateClientRequest.Name;
+        existingClient.Address = updateClientRequest.Address;
+        existingClient.Email = updateClientRequest.Email;
+        existingClient.PhoneNumber = updateClientRequest.PhoneNumber;
 
         if (existingClient is IndividualClient individualClient)
         {
-            if (string.IsNullOrEmpty(clientDto.LastName))
+            if (string.IsNullOrEmpty(updateClientRequest.LastName))
             {
                 return BadRequest("LastName is required for Individual clients.");
             }
-            if (individualClient.PESEL != clientDto.PESEL)
+            if (individualClient.PESEL != updateClientRequest.PESEL)
             {
                 return BadRequest("Cannot change PESEL number for Individual clients.");
             }
         }
         else if (existingClient is CorporateClient corporateClient)
         {
-            if (corporateClient.KRS != clientDto.KRS)
+            if (corporateClient.KRS != updateClientRequest.KRS)
             {
                 return BadRequest("Cannot change KRS number for Corporate clients.");
             }

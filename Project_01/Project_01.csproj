@@ -28,6 +28,7 @@
       <Folder Include="Interfaces\Repositories\" />
       <Folder Include="Interfaces\Services\" />
       <Folder Include="Middlewares\" />
+      <Folder Include="ResponseModels\" />
     </ItemGroup>
 
 </Project>

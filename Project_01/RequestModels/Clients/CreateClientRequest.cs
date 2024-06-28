@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Project_01.DTOs;
+namespace Project_01.RequestModels.Clients;
 
-public class ClientDto
+public class CreateClientRequest
 {
     [Required]
     public string Name { get; set; }

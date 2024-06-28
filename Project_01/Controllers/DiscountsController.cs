@@ -2,6 +2,7 @@
 using Project_01.Domain.Discounts;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
+using Project_01.RequestModels.Discounts;
 
 namespace Project_01.Controllers;
 
@@ -10,12 +11,21 @@ namespace Project_01.Controllers;
 public class DiscountsController(IDiscountService discountService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> AddDiscount([FromBody] Discount discount)
+    public async Task<IActionResult> AddDiscount([FromBody] CreateDiscountRequest createDiscountRequest)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+
+        var discount = new Discount
+        {
+            Name = createDiscountRequest.Name,
+            PercentageValue = createDiscountRequest.PercentageValue,
+            StartDate = createDiscountRequest.StartDate,
+            EndDate = createDiscountRequest.EndDate,
+            ProductId = createDiscountRequest.ProductId
+        };
 
         var addedDiscount = await discountService.AddDiscountAsync(discount);
         return CreatedAtAction(nameof(GetDiscount), new { id = addedDiscount.Id }, addedDiscount);
@@ -41,17 +51,22 @@ public class DiscountsController(IDiscountService discountService) : ControllerB
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateDiscount(int id, [FromBody] Discount discount)
+    public async Task<IActionResult> UpdateDiscount(int id, [FromBody] UpdateDiscountRequest updateDiscountRequest)
     {
-        if (id != discount.Id)
-        {
-            return BadRequest("Id in the body does not match the id in the URL");
-        }
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+
+        var discount = new Discount
+        {
+            Id = id,
+            Name = updateDiscountRequest.Name,
+            PercentageValue = updateDiscountRequest.PercentageValue,
+            StartDate = updateDiscountRequest.StartDate,
+            EndDate = updateDiscountRequest.EndDate,
+            ProductId = updateDiscountRequest.ProductId
+        };
 
         try
         {
