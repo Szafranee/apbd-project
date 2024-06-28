@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_01.Data;
 using Project_01.Domain.Contracts;
+using Project_01.Domain.Payments;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
 
@@ -80,6 +81,39 @@ public class ContractService(DatabaseContext context, IDiscountService discountS
         }
 
         return totalPrice;
+    }
+
+    public async Task<Contract?> GetActiveContractForClientAndProductAsync(int clientId, int productId)
+    {
+        return await context.Contracts
+            .FirstOrDefaultAsync(c => c.ClientId == clientId && c.ProductId == productId && c.Status == ContractStatus.Active);
+    }
+
+    public async Task AddPaymentToContract(int id, Payment payment)
+    {
+        var contract = await context.Contracts
+            .Include(c => c.Payments)
+            .FirstOrDefaultAsync(c => c.Id == id);
+        if (contract == null)
+        {
+            throw new NotFoundException($"Contract with id: {id} not found");
+        }
+
+        contract.Payments.Add(payment);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsContractFullyPaid(int id)
+    {
+        var contract = await context.Contracts
+            .Include(c => c.Payments)
+            .FirstOrDefaultAsync(c => c.Id == id);
+        if (contract == null)
+        {
+            throw new NotFoundException($"Contract with id: {id} not found");
+        }
+
+        return contract.Payments.Sum(p => p.Amount) == contract.TotalPrice;
     }
 
     private async Task<bool> IsReturningCustomer(int clientId)
