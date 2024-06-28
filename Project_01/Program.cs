@@ -21,6 +21,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IRevenueService, RevenueService>();
+builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
 
 var app = builder.Build();
 
