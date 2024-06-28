@@ -8,4 +8,5 @@ public interface IClientService
     Task<Client?> UpdateClientAsync(Client? client);
     Task DeleteClientAsync(int id);
     Task<Client?> GetClientByIdAsync(int id);
+    Task<IEnumerable<Client>?> GetClientsAsync();
 }

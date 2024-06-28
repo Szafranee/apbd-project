@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_01.Domain.Clients;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
@@ -6,6 +7,7 @@ using Project_01.RequestModels.Clients;
 
 namespace Project_01.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ClientsController(IClientService clientService) : ControllerBase
@@ -68,6 +70,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateClient(int id, [FromBody] UpdateClientRequest updateClientRequest)
     {
@@ -106,6 +109,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
         return Ok(updatedClient);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteClient(int id)
     {
@@ -122,6 +126,13 @@ public class ClientsController(IClientService clientService) : ControllerBase
         {
             return BadRequest(e.Message);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetClients()
+    {
+        var clients = await clientService.GetClientsAsync();
+        return Ok(clients);
     }
 
     [HttpGet("{id:int}")]

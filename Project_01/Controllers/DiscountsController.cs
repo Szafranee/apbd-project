@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_01.Domain.Discounts;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
@@ -6,6 +7,7 @@ using Project_01.RequestModels.Discounts;
 
 namespace Project_01.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DiscountsController(IDiscountService discountService) : ControllerBase

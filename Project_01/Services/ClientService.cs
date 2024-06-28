@@ -1,4 +1,5 @@
-﻿using Project_01.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Project_01.Data;
 using Project_01.Domain.Clients;
 using Project_01.Exceptions;
 using Project_01.Interfaces;
@@ -44,6 +45,11 @@ public class ClientService(DatabaseContext context) : IClientService
         }
 
         await context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Client>?> GetClientsAsync()
+    {
+        return await context.Clients.ToListAsync();
     }
 
     public async Task<Client?> GetClientByIdAsync(int id)

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_01.Interfaces;
 using Project_01.Services;
 
 namespace Project_01.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class RevenueController(IRevenueService revenueService) : ControllerBase

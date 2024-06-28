@@ -2,8 +2,10 @@
 using Project_01.Domain.Clients;
 using Project_01.Domain.Contracts;
 using Project_01.Domain.Discounts;
+using Project_01.Domain.Employees;
 using Project_01.Domain.Payments;
 using Project_01.Domain.Products;
+using Project_01.Domain.RefreshTokens;
 
 namespace Project_01.Data;
 
@@ -19,6 +21,8 @@ public class DatabaseContext : DbContext
     public DbSet<Discount?> Discounts { get; set; }
     public DbSet<Contract> Contracts { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Employee> Employees { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,5 +78,10 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<Product>()
             .Property(p => p.YearlyLicenseCost)
             .HasPrecision(18, 2);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.Employee)
+            .WithMany()
+            .HasForeignKey(rt => rt.EmployeeId);
     }
 }
